@@ -1,58 +1,48 @@
 import React, { Component } from "react";
 import { Layout, Input, Button } from "antd";
+import { connect } from 'react-redux'
 
 import firestore from "./firestore";
+import { incrementCount, decrementCount } from './state/actions'
 
 import "./App.css";
 
 const { Header, Footer, Content } = Layout;
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { addingTodo: false, pendingTodo: "" };
-    this.addTodo = this.addTodo.bind(this);
-  }
+const App = props => {
+  const { incrementCount, decrementCount } = props
+  return (
+    <Layout className="App" >
+      {console.log(props)}
+      <Header className="App-header">
+        <h1>Starter Kit</h1>
+      </Header>
+      <Content className="App-content">
 
-  async addTodo(evt) {
-    this.setState({ addingTodo: true });
-    await firestore.collection("todos").add({
-      content: this.state.pendingTodo,
-      completed: false
-    });
-    this.setState({ addingTodo: false, pendingTodo: "" });
-  }
-
-  render() {
-    return (
-      <Layout className="App">
-        <Header className="App-header">
-          <h1>Starter Kit</h1>
-        </Header>
-        <Content className="App-content">
-          <Input
-            ref="add-todo-input"
-            className="App-add-todo-input"
-            size="large"
-            placeholder="Whatever you want"
-            disabled={this.state.addingTodo}
-            onChange={evt => this.setState({ pendingTodo: evt.target.value })}
-            value={this.state.pendingTodo}
-            onPressEnter={this.addTodo}
-          />
-          <Button
-            className="App-add-todo-button"
-            size="large"
-            type="primary"
-            onClick={this.addTodo}
-            loading={this.state.addingTodo}
-          >
-            Add item to firestore
+        <Button
+          className="App-add-todo-button"
+          size="large"
+          type="primary"
+          onClick={incrementCount}
+        >
+          Increment count
           </Button>
-        </Content>
-      </Layout>
-    );
-  }
+        <Button
+          className="App-add-todo-button"
+          size="large"
+          type="primary"
+          onClick={decrementCount}
+        >
+          Decrement count
+          </Button>
+        <h1>{props.count}</h1>
+      </Content>
+    </Layout >
+  );
 }
 
-export default App
+const actions = { incrementCount, decrementCount }
+const state = state => {
+  return { count: state.app.count }
+}
+export default connect(state, actions)(App)
